@@ -1,0 +1,112 @@
+﻿[
+  {
+    "id": "chance_001",
+    "title": "街頭藝人加碼",
+    "description": "在駁二看到街頭藝人表演，心情大好，前進兩格。",
+    "type": "chance",
+    "effectType": "MOVE_STEPS",
+    "effectValue": 2,
+    "target": "self",
+    "icon": "🎭",
+    "rarity": "common"
+  },
+  {
+    "id": "chance_002",
+    "title": "午後陣雨",
+    "description": "遇到高雄大豪雨，行程延誤，暫停一次。",
+    "type": "chance",
+    "effectType": "SKIP_TURNS",
+    "effectValue": 1,
+    "target": "self",
+    "icon": "🌧️",
+    "rarity": "common"
+  },
+  {
+    "id": "chance_003",
+    "title": "港邊音樂祭中獎",
+    "description": "參加港邊音樂祭，中獎獲得 1000 元。",
+    "type": "chance",
+    "effectType": "MONEY",
+    "effectValue": 1000,
+    "target": "self",
+    "icon": "🎉",
+    "rarity": "rare"
+  },
+  {
+    "id": "chance_004",
+    "title": "旅費超支",
+    "description": "觀光花費超支，支付 500 元。",
+    "type": "chance",
+    "effectType": "MONEY",
+    "effectValue": -500,
+    "target": "self",
+    "icon": "💸",
+    "rarity": "common"
+  },
+  {
+    "id": "chance_005",
+    "title": "搭上捷運快線",
+    "description": "直接移動到高雄捷運（紅線）。",
+    "type": "chance",
+    "effectType": "MOVE_TO_TILE",
+    "effectValue": 4,
+    "target": "self",
+    "icon": "🚇",
+    "rarity": "uncommon"
+  },
+  {
+    "id": "chance_006",
+    "title": "熱情粉絲請客",
+    "description": "下次踩到他人景點時，免付過路費一次。",
+    "type": "chance",
+    "effectType": "RENT_IMMUNITY",
+    "effectValue": 1,
+    "target": "self",
+    "icon": "🛡️",
+    "rarity": "uncommon"
+  },
+  {
+    "id": "chance_007",
+    "title": "導覽走錯路",
+    "description": "後退一格。",
+    "type": "chance",
+    "effectType": "MOVE_STEPS",
+    "effectValue": -1,
+    "target": "self",
+    "icon": "↩️",
+    "rarity": "common"
+  },
+  {
+    "id": "chance_008",
+    "title": "港都好運連發",
+    "description": "免費再抽一張機會卡。",
+    "type": "chance",
+    "effectType": "DRAW_AGAIN",
+    "effectValue": 1,
+    "target": "self",
+    "icon": "🃏",
+    "rarity": "rare"
+  },
+  {
+    "id": "chance_009",
+    "title": "旅遊局補助",
+    "description": "領取旅遊補助 600 元。",
+    "type": "chance",
+    "effectType": "MONEY",
+    "effectValue": 600,
+    "target": "self",
+    "icon": "🏖️",
+    "rarity": "common"
+  },
+  {
+    "id": "chance_010",
+    "title": "趕路衝刺",
+    "description": "前進三格。",
+    "type": "chance",
+    "effectType": "MOVE_STEPS",
+    "effectValue": 3,
+    "target": "self",
+    "icon": "🏃",
+    "rarity": "uncommon"
+  }
+]

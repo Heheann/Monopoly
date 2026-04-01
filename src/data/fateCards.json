@@ -1,0 +1,112 @@
+﻿[
+  {
+    "id": "fate_001",
+    "title": "節能家電補助",
+    "description": "領取節能家電補助 1000 元。",
+    "type": "fate",
+    "effectType": "MONEY",
+    "effectValue": 1000,
+    "target": "self",
+    "icon": "🔋",
+    "rarity": "common"
+  },
+  {
+    "id": "fate_002",
+    "title": "共享機車違停",
+    "description": "違規停放共享機車，罰款 200 元。",
+    "type": "fate",
+    "effectType": "MONEY",
+    "effectValue": -200,
+    "target": "self",
+    "icon": "🛵",
+    "rarity": "common"
+  },
+  {
+    "id": "fate_003",
+    "title": "高雄優惠券",
+    "description": "使用高雄優惠券，獲得折扣 300 元。",
+    "type": "fate",
+    "effectType": "MONEY",
+    "effectValue": 300,
+    "target": "self",
+    "icon": "🎫",
+    "rarity": "common"
+  },
+  {
+    "id": "fate_004",
+    "title": "手搖飲消暑",
+    "description": "熱到喝手搖飲消暑，花費 150 元。",
+    "type": "fate",
+    "effectType": "MONEY",
+    "effectValue": -150,
+    "target": "self",
+    "icon": "🥤",
+    "rarity": "common"
+  },
+  {
+    "id": "fate_005",
+    "title": "燈會志工獎勵",
+    "description": "參加燈會志工活動，獲得獎勵 500 元。",
+    "type": "fate",
+    "effectType": "MONEY",
+    "effectValue": 500,
+    "target": "self",
+    "icon": "🏮",
+    "rarity": "uncommon"
+  },
+  {
+    "id": "fate_006",
+    "title": "通勤延誤",
+    "description": "捷運尖峰擁擠，後退兩格。",
+    "type": "fate",
+    "effectType": "MOVE_STEPS",
+    "effectValue": -2,
+    "target": "self",
+    "icon": "⏱️",
+    "rarity": "common"
+  },
+  {
+    "id": "fate_007",
+    "title": "觀光節攤位",
+    "description": "接到短期觀光攤位，前進一格。",
+    "type": "fate",
+    "effectType": "MOVE_STEPS",
+    "effectValue": 1,
+    "target": "self",
+    "icon": "🎪",
+    "rarity": "common"
+  },
+  {
+    "id": "fate_008",
+    "title": "市民服務加值",
+    "description": "獲得免扣錢一次。",
+    "type": "fate",
+    "effectType": "MONEY_IMMUNITY",
+    "effectValue": 1,
+    "target": "self",
+    "icon": "🧾",
+    "rarity": "rare"
+  },
+  {
+    "id": "fate_009",
+    "title": "捷運公益票",
+    "description": "直接移動到高雄輕軌（龍貓隧道段）。",
+    "type": "fate",
+    "effectType": "MOVE_TO_TILE",
+    "effectValue": 16,
+    "target": "self",
+    "icon": "🚊",
+    "rarity": "uncommon"
+  },
+  {
+    "id": "fate_010",
+    "title": "在地好心人",
+    "description": "獲得題目保護一次。",
+    "type": "fate",
+    "effectType": "QUIZ_SHIELD",
+    "effectValue": 1,
+    "target": "self",
+    "icon": "💡",
+    "rarity": "rare"
+  }
+]

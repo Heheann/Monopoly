@@ -1,0 +1,31 @@
+﻿{
+  "initialMoney": 12000,
+  "startBonus": 2000,
+  "minPlayers": 2,
+  "maxPlayers": 4,
+  "groupBonusMultiplier": 1.5,
+  "tokens": [
+    { "id": "duck", "name": "黃色小鴨", "icon": "🦆" },
+    { "id": "monkey", "name": "壽山獼猴", "icon": "🐒" },
+    { "id": "tram", "name": "輕軌車頭", "icon": "🚊" },
+    { "id": "ferry", "name": "渡輪", "icon": "⛴️" },
+    { "id": "banana", "name": "香蕉", "icon": "🍌" }
+  ],
+  "comboRules": [
+    {
+      "id": "combo_art_revival",
+      "name": "文藝復興租金",
+      "requiredPropertyIds": ["pier2", "kmc"],
+      "bonusMultiplier": 1.4,
+      "description": "同時持有駁二與高流，租金額外提升。"
+    }
+  ],
+  "quizConfig": {
+    "defaultRewardMoney": 500,
+    "defaultPenaltyMoney": -300,
+    "turnGateEnabled": true,
+    "turnGateFailPolicy": "end_turn",
+    "drawPolicy": "random_no_repeat",
+    "requireOptionsCount": 4
+  }
+}

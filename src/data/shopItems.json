@@ -1,0 +1,152 @@
+﻿[
+  {
+    "id": "item_reroll",
+    "name": "重擲骰子",
+    "type": "reroll",
+    "price": 350,
+    "icon": "🎲",
+    "description": "你的回合可立即重新擲骰一次。",
+    "timing": "own_turn_before_roll",
+    "stackable": true,
+    "maxCarry": 3,
+    "effect": {
+      "kind": "REROLL",
+      "value": 1
+    }
+  },
+  {
+    "id": "item_fixed_dice",
+    "name": "指定骰子點數",
+    "type": "fixed_dice",
+    "price": 900,
+    "icon": "🎯",
+    "description": "你的回合可指定 1~6 點移動。",
+    "timing": "own_turn_before_roll",
+    "stackable": true,
+    "maxCarry": 2,
+    "effect": {
+      "kind": "FIXED_DICE",
+      "value": 1
+    }
+  },
+  {
+    "id": "item_rent_shield",
+    "name": "免付過路費一次",
+    "type": "rent_shield",
+    "price": 700,
+    "icon": "🛡️",
+    "description": "下一次踩到他人景點可免租。",
+    "timing": "anytime",
+    "stackable": true,
+    "maxCarry": 4,
+    "effect": {
+      "kind": "RENT_IMMUNITY",
+      "value": 1
+    }
+  },
+  {
+    "id": "item_money_shield",
+    "name": "免扣錢一次",
+    "type": "money_shield",
+    "price": 750,
+    "icon": "💳",
+    "description": "下一次扣款可直接抵銷。",
+    "timing": "anytime",
+    "stackable": true,
+    "maxCarry": 4,
+    "effect": {
+      "kind": "MONEY_IMMUNITY",
+      "value": 1
+    }
+  },
+  {
+    "id": "item_forward3",
+    "name": "前進 3 格",
+    "type": "move_forward",
+    "price": 500,
+    "icon": "⏩",
+    "description": "立即前進三格並觸發該格事件。",
+    "timing": "own_turn",
+    "stackable": true,
+    "maxCarry": 3,
+    "effect": {
+      "kind": "MOVE_STEPS",
+      "value": 3
+    }
+  },
+  {
+    "id": "item_back2",
+    "name": "後退 2 格",
+    "type": "move_back",
+    "price": 400,
+    "icon": "⏪",
+    "description": "立即後退兩格並觸發該格事件。",
+    "timing": "own_turn",
+    "stackable": true,
+    "maxCarry": 3,
+    "effect": {
+      "kind": "MOVE_STEPS",
+      "value": -2
+    }
+  },
+  {
+    "id": "item_land_discount",
+    "name": "土地折價券",
+    "type": "land_discount",
+    "price": 600,
+    "icon": "🏷️",
+    "description": "下次購買景點可折抵 500 元。",
+    "timing": "anytime",
+    "stackable": true,
+    "maxCarry": 2,
+    "effect": {
+      "kind": "LAND_DISCOUNT",
+      "value": 500
+    }
+  },
+  {
+    "id": "item_free_upgrade",
+    "name": "免費升級房屋一次",
+    "type": "free_upgrade",
+    "price": 1200,
+    "icon": "🏠",
+    "description": "可對自己任一景點免費升級一級。",
+    "timing": "own_turn",
+    "stackable": true,
+    "maxCarry": 2,
+    "effect": {
+      "kind": "FREE_UPGRADE",
+      "value": 1
+    }
+  },
+  {
+    "id": "item_jail_break",
+    "name": "解困卡",
+    "type": "unstuck",
+    "price": 650,
+    "icon": "🗝️",
+    "description": "立即解除停留狀態。",
+    "timing": "anytime",
+    "stackable": true,
+    "maxCarry": 2,
+    "effect": {
+      "kind": "REMOVE_STUCK",
+      "value": 1
+    }
+  },
+  {
+    "id": "item_quiz_shield",
+    "name": "題目保護卡",
+    "type": "quiz_shield",
+    "price": 550,
+    "icon": "🧠",
+    "description": "下一次答錯題目可免罰。",
+    "timing": "anytime",
+    "stackable": true,
+    "maxCarry": 3,
+    "effect": {
+      "kind": "QUIZ_SHIELD",
+      "value": 1
+    }
+  }
+]

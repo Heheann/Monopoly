@@ -1,0 +1,122 @@
+[
+  {
+    "id": "q001",
+    "question": "高雄港著名的河岸景觀是？",
+    "options": ["愛河", "淡水河", "大漢溪", "濁水溪"],
+    "answerIndex": 0,
+    "explanation": "愛河貫穿市區，是高雄重要水岸景觀。",
+    "category": "地理",
+    "difficulty": "easy",
+    "enabled": true,
+    "reward": { "money": 400, "moveSteps": 0, "skipTurns": 0 },
+    "penalty": { "money": -250, "moveSteps": 0, "skipTurns": 0 }
+  },
+  {
+    "id": "q002",
+    "question": "旗津前往市區常用交通為何？",
+    "options": ["高鐵", "渡輪", "纜車", "馬車"],
+    "answerIndex": 1,
+    "explanation": "旗津與鼓山間渡輪是經典交通方式。",
+    "category": "交通",
+    "difficulty": "easy",
+    "enabled": true,
+    "reward": { "money": 450, "moveSteps": 1, "skipTurns": 0 },
+    "penalty": { "money": -250, "moveSteps": -1, "skipTurns": 0 }
+  },
+  {
+    "id": "q003",
+    "question": "高雄流行音樂中心位於哪個港區周邊？",
+    "options": ["前鎮漁港", "愛河灣", "左營軍港", "旗山溪畔"],
+    "answerIndex": 1,
+    "explanation": "高流位於愛河灣周邊。",
+    "category": "景點",
+    "difficulty": "medium",
+    "enabled": true,
+    "reward": { "money": 600, "moveSteps": 0, "skipTurns": 0 },
+    "penalty": { "money": -300, "moveSteps": 0, "skipTurns": 1 }
+  },
+  {
+    "id": "q004",
+    "question": "蓮池潭著名地標為何？",
+    "options": ["龍虎塔", "赤崁樓", "億載金城", "安平樹屋"],
+    "answerIndex": 0,
+    "explanation": "蓮池潭最知名地標即龍虎塔。",
+    "category": "歷史",
+    "difficulty": "easy",
+    "enabled": true,
+    "reward": { "money": 450, "moveSteps": 0, "skipTurns": 0 },
+    "penalty": { "money": -200, "moveSteps": 0, "skipTurns": 0 }
+  },
+  {
+    "id": "q005",
+    "question": "高雄捷運紅線可到達哪個交通樞紐？",
+    "options": ["高雄車站", "台南車站", "嘉義車站", "屏東車站"],
+    "answerIndex": 0,
+    "explanation": "紅線行經高雄車站。",
+    "category": "交通",
+    "difficulty": "medium",
+    "enabled": true,
+    "reward": { "money": 500, "moveSteps": 1, "skipTurns": 0 },
+    "penalty": { "money": -300, "moveSteps": 0, "skipTurns": 0 }
+  },
+  {
+    "id": "q006",
+    "question": "壽山以哪種動物聞名？",
+    "options": ["梅花鹿", "獼猴", "黑熊", "石虎"],
+    "answerIndex": 1,
+    "explanation": "壽山獼猴是高雄知名代表。",
+    "category": "自然",
+    "difficulty": "easy",
+    "enabled": true,
+    "reward": { "money": 400, "moveSteps": 0, "skipTurns": 0 },
+    "penalty": { "money": -200, "moveSteps": 0, "skipTurns": 0 }
+  },
+  {
+    "id": "q007",
+    "question": "高雄著名夜市中，常見海鮮與觀光客聚集的是？",
+    "options": ["瑞豐夜市", "六合夜市", "逢甲夜市", "花園夜市"],
+    "answerIndex": 1,
+    "explanation": "六合夜市是觀光客熟知夜市。",
+    "category": "美食",
+    "difficulty": "easy",
+    "enabled": true,
+    "reward": { "money": 500, "moveSteps": 0, "skipTurns": 0 },
+    "penalty": { "money": -300, "moveSteps": 0, "skipTurns": 0 }
+  },
+  {
+    "id": "q008",
+    "question": "85 大樓最吸引人的體驗是？",
+    "options": ["溫泉泡湯", "觀景台俯瞰", "溜冰場", "動物園"],
+    "answerIndex": 1,
+    "explanation": "85 大樓觀景台可俯瞰港都天際線。",
+    "category": "景點",
+    "difficulty": "medium",
+    "enabled": true,
+    "reward": { "money": 650, "moveSteps": 0, "skipTurns": 0 },
+    "penalty": { "money": -300, "moveSteps": -1, "skipTurns": 0 }
+  },
+  {
+    "id": "q009",
+    "question": "駁二藝術特區前身多為哪類空間？",
+    "options": ["醫院", "學校", "倉庫", "市場"],
+    "answerIndex": 2,
+    "explanation": "駁二前身為港邊倉庫群。",
+    "category": "文化",
+    "difficulty": "medium",
+    "enabled": true,
+    "reward": { "money": 600, "moveSteps": 1, "skipTurns": 0 },
+    "penalty": { "money": -300, "moveSteps": 0, "skipTurns": 1 }
+  },
+  {
+    "id": "q010",
+    "question": "旗津彩虹教堂屬於哪種旅遊特色？",
+    "options": ["古蹟巡禮", "工業遺址", "拍照打卡", "宗教進香"],
+    "answerIndex": 2,
+    "explanation": "彩虹教堂是熱門拍照打卡景點。",
+    "category": "景點",
+    "difficulty": "easy",
+    "enabled": true,
+    "reward": { "money": 420, "moveSteps": 0, "skipTurns": 0 },
+    "penalty": { "money": -220, "moveSteps": 0, "skipTurns": 0 }
+  }
+]

@@ -203,6 +203,26 @@ export interface PaymentNotice {
   isWaived: boolean;
 }
 
+export type SoundEventType =
+  | "quiz_correct"
+  | "quiz_wrong"
+  | "property_buy"
+  | "property_upgrade"
+  | "payment_to_player"
+  | "payment_to_system"
+  | "payment_waived"
+  | "shop_buy"
+  | "card_draw"
+  | "dice_roll"
+  | "pass_start_bonus"
+  | "game_end";
+
+export interface SoundEvent {
+  id: string;
+  type: SoundEventType;
+  createdAt: number;
+}
+
 export interface ModalState {
   type: "property" | "shop" | "card" | "quiz" | "message" | "payment_notice" | null;
   payload?: unknown;
@@ -220,6 +240,7 @@ export interface GameState {
   turnGate: TurnGateState;
   questionCycle: QuestionCycleState;
   paymentNoticeQueue: PaymentNotice[];
+  soundQueue: SoundEvent[];
   winnerId: string | null;
 }
 

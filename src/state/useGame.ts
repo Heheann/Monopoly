@@ -26,6 +26,8 @@ import type {
   QuestionDef,
   SeedDataBundle,
   ShopItemDef,
+  SoundEvent,
+  SoundEventType,
   TurnGateState,
   TurnPhase
 } from "../types/game";
@@ -98,6 +100,7 @@ function createEmptyGameState(): GameState {
     turnGate: createEmptyTurnGateState(),
     questionCycle: createEmptyQuestionCycle(),
     paymentNoticeQueue: [],
+    soundQueue: [],
     winnerId: null
   };
 }
@@ -113,7 +116,8 @@ function normalizeSavedState(saved: GameState | null): GameState {
     ...saved,
     turnGate: saved.turnGate ?? fallback.turnGate,
     questionCycle: saved.questionCycle ?? fallback.questionCycle,
-    paymentNoticeQueue: saved.paymentNoticeQueue ?? []
+    paymentNoticeQueue: saved.paymentNoticeQueue ?? [],
+    soundQueue: saved.soundQueue ?? []
   };
 }
 
@@ -170,6 +174,16 @@ export function useGame(initialData: SeedDataBundle) {
     id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     ...input
   });
+
+  const createSoundEvent = (type: SoundEventType): SoundEvent => ({
+    id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    type,
+    createdAt: Date.now()
+  });
+
+  const enqueueSound = (type: SoundEventType) => {
+    setGameState((prev) => ({ ...prev, soundQueue: [...prev.soundQueue, createSoundEvent(type)] }));
+  };
 
   const canPayWithOptionalImmunity = (player: PlayerState, amount: number, allowImmunity = true): boolean => {
     if (amount <= 0) return true;
@@ -263,6 +277,7 @@ export function useGame(initialData: SeedDataBundle) {
           ...prev,
           players,
           paymentNoticeQueue: [...prev.paymentNoticeQueue, notice],
+          soundQueue: [...prev.soundQueue, createSoundEvent("payment_waived")],
           log: appendLog(prev.log, `${payer.name} 使用免付過路費，免除租金。`)
         };
       }
@@ -290,6 +305,7 @@ export function useGame(initialData: SeedDataBundle) {
           ...prev,
           players,
           paymentNoticeQueue: [...prev.paymentNoticeQueue, notice],
+          soundQueue: [...prev.soundQueue, createSoundEvent("payment_waived")],
           log: appendLog(prev.log, `${payer.name} 使用免扣錢效果，抵銷 ${amount} 元。`)
         };
       }
@@ -319,6 +335,7 @@ export function useGame(initialData: SeedDataBundle) {
         ...prev,
         players,
         paymentNoticeQueue: [...prev.paymentNoticeQueue, notice],
+        soundQueue: [...prev.soundQueue, createSoundEvent("payment_to_player")],
         log: appendLog(prev.log, `${payer.name} 支付 ${amount} 元給 ${receiver.name}（${reason}）。`)
       };
     });
@@ -357,6 +374,7 @@ export function useGame(initialData: SeedDataBundle) {
           ...prev,
           players,
           paymentNoticeQueue: [...prev.paymentNoticeQueue, notice],
+          soundQueue: [...prev.soundQueue, createSoundEvent("payment_waived")],
           log: appendLog(prev.log, `${payer.name} 觸發免扣錢，抵銷 ${amount} 元（${reason}）。`)
         };
       }
@@ -382,6 +400,7 @@ export function useGame(initialData: SeedDataBundle) {
         ...prev,
         players,
         paymentNoticeQueue: [...prev.paymentNoticeQueue, notice],
+        soundQueue: [...prev.soundQueue, createSoundEvent("payment_to_system")],
         log: appendLog(prev.log, `${payer.name} 支出 ${amount} 元（${reason}）。`)
       };
     });
@@ -455,6 +474,7 @@ export function useGame(initialData: SeedDataBundle) {
       const deck = tile.type === "chance" ? dataBundle.chanceCards : dataBundle.fateCards;
       const card = getRandomElement(deck);
       writeLog(`${player.name} 抽到 ${tile.type === "chance" ? "驚喜港都" : "在地生活"}卡：${card.title}`);
+      enqueueSound("card_draw");
       setModal("card", { card });
       return;
     }
@@ -534,6 +554,10 @@ export function useGame(initialData: SeedDataBundle) {
         return {
           ...prev,
           players,
+          soundQueue:
+            direction > 0 && movement.passedStart
+              ? [...prev.soundQueue, createSoundEvent("pass_start_bonus")]
+              : prev.soundQueue,
           log:
             direction > 0 && movement.passedStart
               ? appendLog(prev.log, `${current.name} 經過起點，領取 ${dataBundle.gameConfig.startBonus} 元旅遊津貼。`)
@@ -571,6 +595,7 @@ export function useGame(initialData: SeedDataBundle) {
         players,
         phase: "moving",
         lastDice: dice,
+        soundQueue: [...prev.soundQueue, createSoundEvent("dice_roll")],
         log: appendLog(prev.log, `${current.name} 擲出 ${dice} 點。`)
       };
     });
@@ -678,6 +703,7 @@ export function useGame(initialData: SeedDataBundle) {
       turnGate: createEmptyTurnGateState(),
       questionCycle: { remainingIds: shuffle(eligible.map((question) => question.id)), usedIds: [] },
       paymentNoticeQueue: [],
+      soundQueue: [],
       winnerId: null
     });
   };
@@ -704,6 +730,7 @@ export function useGame(initialData: SeedDataBundle) {
       winnerId: champion?.playerId ?? null,
       modal: { type: null },
       paymentNoticeQueue: [],
+      soundQueue: [...latest.soundQueue, createSoundEvent("game_end")],
       turnGate: { ...latest.turnGate, mode: null },
       log: appendLog(latest.log, `遊戲已手動結束，冠軍為 ${champion?.name ?? "無"}。`)
     };
@@ -754,6 +781,7 @@ export function useGame(initialData: SeedDataBundle) {
         properties: { ...prev.properties, [tile.id]: { ...prev.properties[tile.id], ownerId: current.id, level: 0 } },
         modal: { type: null },
         phase: "await_end",
+        soundQueue: [...prev.soundQueue, createSoundEvent("property_buy")],
         log: appendLog(
           prev.log,
           consumedDiscount > 0
@@ -817,6 +845,7 @@ export function useGame(initialData: SeedDataBundle) {
         properties: { ...prev.properties, [tile.id]: { ...prev.properties[tile.id], level: prev.properties[tile.id].level + 1 } },
         modal: { type: null },
         phase: "await_end",
+        soundQueue: [...prev.soundQueue, createSoundEvent("property_upgrade")],
         log: appendLog(
           prev.log,
           useFreeUpgrade
@@ -856,6 +885,16 @@ export function useGame(initialData: SeedDataBundle) {
     });
   };
 
+  const acknowledgeSound = () => {
+    setGameState((prev) => {
+      if (prev.soundQueue.length === 0) return prev;
+      return {
+        ...prev,
+        soundQueue: prev.soundQueue.slice(1)
+      };
+    });
+  };
+
   const buyShopItem = (item: ShopItemDef) => {
     const latest = stateRef.current;
     const player = latest.players[latest.currentPlayerIndex];
@@ -883,6 +922,7 @@ export function useGame(initialData: SeedDataBundle) {
       return {
         ...prev,
         players,
+        soundQueue: [...prev.soundQueue, createSoundEvent("shop_buy")],
         log: appendLog(
           prev.log,
           willWaiveByImmunity
@@ -933,6 +973,7 @@ export function useGame(initialData: SeedDataBundle) {
       case "DRAW_AGAIN": {
         const deck = card.type === "chance" ? dataBundle.chanceCards : dataBundle.fateCards;
         const drawAgainCard = getRandomElement(deck);
+        enqueueSound("card_draw");
         setModal("card", { card: drawAgainCard });
         writeLog(`${player.name} 觸發再抽卡：${drawAgainCard.title}`);
         return;
@@ -970,11 +1011,13 @@ export function useGame(initialData: SeedDataBundle) {
 
     if (source === "turn_gate") {
       if (isCorrect) {
+        enqueueSound("quiz_correct");
         writeLog(`${player.name} 答對回合題目，取得行動資格。`);
         setGameState((prev) => ({ ...prev, phase: "await_roll", turnGate: { passed: true, questionId: question.id, mode: null } }));
         return;
       }
 
+      enqueueSound("quiz_wrong");
       if (player.statusEffects.quizShield > 0) {
         withCurrentPlayer((current) => ({
           ...current,
@@ -993,6 +1036,7 @@ export function useGame(initialData: SeedDataBundle) {
     }
 
     if (isCorrect) {
+      enqueueSound("quiz_correct");
       writeLog(`${player.name} 答對題目：${question.question}`);
       if (question.reward.money > 0) addMoney(player.id, question.reward.money, "答題獎勵");
       if (question.reward.skipTurns > 0) applySkipTurns(player.id, question.reward.skipTurns, "答題效果");
@@ -1005,6 +1049,7 @@ export function useGame(initialData: SeedDataBundle) {
       return;
     }
 
+    enqueueSound("quiz_wrong");
     if (player.statusEffects.quizShield > 0) {
       withCurrentPlayer((current) => ({
         ...current,
@@ -1164,6 +1209,7 @@ export function useGame(initialData: SeedDataBundle) {
     upgradeCurrentTileProperty,
     skipModal,
     acknowledgePaymentNotice,
+    acknowledgeSound,
     buyShopItem,
     applyCard,
     answerQuestion,

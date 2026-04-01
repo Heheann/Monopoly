@@ -6,6 +6,7 @@ import { InventoryPanel } from "../components/InventoryPanel";
 import { ModalShell } from "../components/ModalShell";
 import { PlayerPanel } from "../components/PlayerPanel";
 import { SetupPanel } from "../components/SetupPanel";
+import { sfxEngine } from "../audio/sfxEngine";
 import { findPropertyDef } from "../engine/gameEngine";
 import { loadDataBundle } from "../state/dataStore";
 import { useGame } from "../state/useGame";
@@ -16,6 +17,7 @@ export function GamePage() {
   const game = useGame(loadDataBundle());
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const lastAutoReadQuestionIdRef = useRef<string | null>(null);
+  const activeSoundIdRef = useRef<string | null>(null);
   const ttsSupported =
     typeof window !== "undefined" &&
     "speechSynthesis" in window &&
@@ -32,6 +34,17 @@ export function GamePage() {
     return Math.min(1.4, Math.max(0.7, raw));
   });
   const [ttsSpeaking, setTtsSpeaking] = useState(false);
+  const [sfxEnabled, setSfxEnabled] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const raw = window.localStorage.getItem("kaohsiung_sfx_enabled");
+    return raw === null ? true : raw === "true";
+  });
+  const [sfxVolume, setSfxVolume] = useState<number>(() => {
+    if (typeof window === "undefined") return 0.7;
+    const raw = Number(window.localStorage.getItem("kaohsiung_sfx_volume") ?? "0.7");
+    if (!Number.isFinite(raw)) return 0.7;
+    return Math.min(1, Math.max(0, raw));
+  });
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
 
   const currentPlayer = game.currentPlayer;
@@ -103,6 +116,51 @@ export function GamePage() {
   }, [ttsRate]);
 
   useEffect(() => {
+    sfxEngine.setEnabled(sfxEnabled);
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("kaohsiung_sfx_enabled", String(sfxEnabled));
+  }, [sfxEnabled]);
+
+  useEffect(() => {
+    sfxEngine.setVolume(sfxVolume);
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("kaohsiung_sfx_volume", String(sfxVolume));
+  }, [sfxVolume]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const unlockAudio = () => {
+      void sfxEngine.unlock();
+    };
+    window.addEventListener("pointerdown", unlockAudio, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudio);
+    };
+  }, []);
+
+  useEffect(() => {
+    const nextSound = game.gameState.soundQueue[0];
+    if (!nextSound) {
+      activeSoundIdRef.current = null;
+      return;
+    }
+    if (activeSoundIdRef.current === nextSound.id) return;
+
+    activeSoundIdRef.current = nextSound.id;
+    let cancelled = false;
+    void sfxEngine.play(nextSound.type).finally(() => {
+      if (!cancelled) {
+        activeSoundIdRef.current = null;
+        game.acknowledgeSound();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [game.gameState.soundQueue, game.acknowledgeSound]);
+
+  useEffect(() => {
     if (game.gameState.modal.type !== "quiz" || !quizModalPayload?.question) {
       lastAutoReadQuestionIdRef.current = null;
       stopQuizTts();
@@ -162,6 +220,28 @@ export function GamePage() {
           <Link className="nav-link" to="/admin">
             前往後台
           </Link>
+          <div className="audio-control-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={sfxEnabled}
+                onChange={(event) => setSfxEnabled(event.currentTarget.checked)}
+              />
+              音效
+            </label>
+            <label className="audio-volume-control">
+              音量：{Math.round(sfxVolume * 100)}%
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={sfxVolume}
+                disabled={!sfxEnabled}
+                onChange={(event) => setSfxVolume(Number(event.currentTarget.value))}
+              />
+            </label>
+          </div>
         </div>
       </header>
 

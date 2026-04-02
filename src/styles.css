@@ -507,6 +507,317 @@ button:disabled {
   gap: 8px;
 }
 
+.mono-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(29, 21, 38, 0.34);
+  backdrop-filter: blur(3px);
+}
+
+.mono-popup-card {
+  width: min(560px, 100%);
+  max-height: min(92vh, 980px);
+  overflow: auto;
+  border-radius: 34px;
+  background: #fff;
+  box-shadow: 0 24px 48px rgba(24, 14, 46, 0.2);
+  position: relative;
+}
+
+.mono-popup-head-bg {
+  height: 128px;
+  background: linear-gradient(135deg, #f9edf2 0%, #f8f2e8 55%, #eef5ff 100%);
+}
+
+.mono-popup-body {
+  padding: 16px 22px 22px;
+  display: grid;
+  gap: 14px;
+  margin-top: -96px;
+}
+
+.mono-popup-close {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  font-size: 1.5rem;
+  color: #6d6d6d;
+  line-height: 1;
+  box-shadow: 0 5px 12px rgba(31, 24, 40, 0.12);
+}
+
+.mono-popup-close:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.mono-player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+}
+
+.mono-player-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  color: #ffffff;
+  background: linear-gradient(180deg, #ffbfc8 0%, #f59fb0 100%);
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(48, 28, 45, 0.18);
+}
+
+.mono-player-hint {
+  color: #5f5564;
+  font-size: 1.06rem;
+  font-weight: 700;
+  margin-right: 48px;
+}
+
+.mono-location-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2f3540;
+}
+
+.mono-location-image-wrap {
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(24, 23, 45, 0.16);
+  background: linear-gradient(135deg, #f9f0dd, #f3e6c9);
+  aspect-ratio: 4 / 3;
+}
+
+.mono-location-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mono-location-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 8px;
+  color: #7f6d50;
+}
+
+.mono-location-fallback span {
+  font-size: 2.2rem;
+}
+
+.mono-location-fallback p {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.mono-effect-card {
+  border-radius: 20px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 16px rgba(37, 26, 61, 0.1);
+}
+
+.mono-effect-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(37, 26, 61, 0.12);
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+}
+
+.mono-effect-content {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+}
+
+.mono-effect-title {
+  font-size: 1.08rem;
+  color: #2e3342;
+  font-weight: 700;
+}
+
+.mono-effect-amount {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #1f2734;
+  line-height: 1.05;
+}
+
+.mono-effect-sub {
+  font-size: 0.9rem;
+  color: #555f73;
+  margin-top: 2px;
+}
+
+.mono-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mono-btn {
+  flex: 1;
+  min-width: 120px;
+  border-radius: 16px;
+  border: none;
+  padding: 13px 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.mono-btn-soft {
+  background: linear-gradient(135deg, #b8e6f0 0%, #a5dbe8 100%);
+  color: #23495c;
+}
+
+.mono-btn-primary {
+  background: linear-gradient(135deg, #f7a7b4 0%, #ef8f9f 100%);
+  color: #fff;
+}
+
+.mono-shop-grid {
+  display: grid;
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.mono-shop-item {
+  background: #f7fcff;
+  border: 1px solid #dcecf5;
+  border-radius: 14px;
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.mono-shop-item h4 {
+  font-size: 0.95rem;
+}
+
+.mono-shop-item p {
+  font-size: 0.85rem;
+}
+
+.mono-shop-item .mono-btn {
+  margin-top: 4px;
+}
+
+.mono-quiz-tts {
+  border: 1px solid #e6d8f2;
+  border-radius: 14px;
+  background: #fdf8ff;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.mono-quiz-tts-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.mono-tts-speed {
+  display: grid;
+  gap: 4px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #45396d;
+}
+
+.mono-tts-speed input[type="range"] {
+  width: 180px;
+  accent-color: #9871cc;
+}
+
+.mono-quiz-options {
+  display: grid;
+  gap: 8px;
+}
+
+.mono-quiz-option-btn {
+  width: 100%;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid #dfd8eb;
+  border-radius: 14px;
+  padding: 12px 13px;
+  color: #2f3444;
+  font-weight: 700;
+}
+
+.mono-quiz-option-btn:hover {
+  background: #fbf7ff;
+}
+
+.mono-payment-list {
+  display: grid;
+  gap: 2px;
+}
+
+.mono-popup-bottom-line {
+  height: 10px;
+  background: linear-gradient(90deg, #f8b3c4 0%, #bde4f2 53%, #d8c7f8 100%);
+}
+
+.mono-theme-earn .mono-effect-card {
+  background: linear-gradient(135deg, #ffe5b4 0%, #fdd6a5 100%);
+}
+
+.mono-theme-buy .mono-effect-card {
+  background: linear-gradient(135deg, #d4f1f4 0%, #bfe7ec 100%);
+}
+
+.mono-theme-pay .mono-effect-card {
+  background: linear-gradient(135deg, #ffd7e5 0%, #f9c4d8 100%);
+}
+
+.mono-theme-quiz .mono-effect-card {
+  background: linear-gradient(135deg, #e7dbff 0%, #d8c6ff 100%);
+}
+
+.mono-theme-shop .mono-effect-card {
+  background: linear-gradient(135deg, #fff2cc 0%, #ffe8b3 100%);
+}
+
+.mono-theme-card .mono-effect-card {
+  background: linear-gradient(135deg, #e5d4ff 0%, #d4bbff 100%);
+}
+
+.mono-theme-message .mono-effect-card {
+  background: linear-gradient(135deg, #f6f0ff 0%, #ebe4ff 100%);
+}
+
+.mono-theme-confirm .mono-effect-card {
+  background: linear-gradient(135deg, #ffe0d6 0%, #ffd0c0 100%);
+}
+
 .retro-modal-overlay {
   background: rgba(23, 16, 35, 0.62);
 }
@@ -960,5 +1271,36 @@ button:disabled {
 
   .game-layout {
     padding: 0 12px;
+  }
+
+  .mono-popup-card {
+    border-radius: 24px;
+  }
+
+  .mono-popup-head-bg {
+    height: 108px;
+  }
+
+  .mono-popup-body {
+    margin-top: -84px;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .mono-player-hint {
+    font-size: 0.95rem;
+    margin-right: 38px;
+  }
+
+  .mono-location-title {
+    font-size: 1.65rem;
+  }
+
+  .mono-effect-amount {
+    font-size: 1.5rem;
+  }
+
+  .mono-btn {
+    min-width: 100%;
   }
 }

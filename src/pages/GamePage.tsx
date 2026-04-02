@@ -1,16 +1,17 @@
-﻿import { useCallback, useEffect, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Board } from "../components/Board";
 import { EventLog } from "../components/EventLog";
 import { InventoryPanel } from "../components/InventoryPanel";
-import { ModalShell } from "../components/ModalShell";
+import { MonopolyPopup } from "../components/MonopolyPopup";
 import { PlayerPanel } from "../components/PlayerPanel";
 import { SetupPanel } from "../components/SetupPanel";
 import { sfxEngine } from "../audio/sfxEngine";
 import { findPropertyDef } from "../engine/gameEngine";
 import { loadDataBundle } from "../state/dataStore";
 import { useGame } from "../state/useGame";
-import type { CardDef, PaymentNotice, QuestionDef, ShopItemDef } from "../types/game";
+import type { BoardTile, CardDef, PaymentNotice, QuestionDef, ShopItemDef } from "../types/game";
+import { getLandmarkImageSrc } from "../ui/popupAssets";
 
 export function GamePage() {
   const navigate = useNavigate();
@@ -59,6 +60,31 @@ export function GamePage() {
     | undefined;
   const paymentModalPayload = game.gameState.modal.payload as { notice: PaymentNotice } | undefined;
   const messageModalPayload = game.gameState.modal.payload as { title: string; message: string } | undefined;
+  const boardByName = useMemo(() => new Map(game.board.map((tile) => [tile.name, tile])), [game.board]);
+  const currentPlayerName = currentPlayer?.name ?? "玩家";
+  const currentPlayerToken = currentPlayer?.tokenIcon ?? "🙂";
+
+  const resolvePaymentTile = useCallback(
+    (notice?: PaymentNotice): BoardTile | null => {
+      if (!notice?.reason) return null;
+      const directMatch = notice.reason.match(/^租金：(.+)$/);
+      if (directMatch) {
+        return boardByName.get(directMatch[1]) ?? null;
+      }
+      return null;
+    },
+    [boardByName]
+  );
+
+  const resolveMessageTile = useCallback(
+    (title?: string): BoardTile | null => {
+      if (!title) return null;
+      const directMatch = title.match(/^抵達：(.+)$/);
+      if (!directMatch) return null;
+      return boardByName.get(directMatch[1]) ?? null;
+    },
+    [boardByName]
+  );
 
   const stopQuizTts = useCallback(() => {
     if (!ttsSupported) return;
@@ -308,106 +334,154 @@ export function GamePage() {
       )}
 
       {game.gameState.modal.type === "property" && currentPlayer ? (
-        <ModalShell title="景點地產" onClose={game.skipModal} variant="retro">
-          {(() => {
-            const tileId = propertyModalPayload?.tileId;
-            if (!tileId) {
-              return <p>讀取中...</p>;
-            }
-            const tile = game.board.find((item) => item.id === tileId);
-            const propertyState = game.gameState.properties[tileId];
-            const propertyDef = findPropertyDef(tileId, game.dataBundle.properties);
-            if (!tile || !propertyState || !propertyDef) {
-              return <p>找不到景點資料。</p>;
-            }
+        (() => {
+          const tileId = propertyModalPayload?.tileId;
+          const tile = tileId ? game.board.find((item) => item.id === tileId) : null;
+          const propertyState = tileId ? game.gameState.properties[tileId] : null;
+          const propertyDef = tileId ? findPropertyDef(tileId, game.dataBundle.properties) : null;
+          const owner = propertyState?.ownerId
+            ? game.gameState.players.find((player) => player.id === propertyState.ownerId)
+            : null;
 
-            const owner = propertyState.ownerId
-              ? game.gameState.players.find((player) => player.id === propertyState.ownerId)
-              : null;
+          if (!tile || !propertyState || !propertyDef) {
+            return (
+              <MonopolyPopup
+                playerName={currentPlayerName}
+                playerTokenIcon={currentPlayerToken}
+                locationName="景點資料讀取中"
+                fallbackIcon="🏞️"
+                theme="message"
+                effectIcon="⏳"
+                effectTitle="資料載入中，請稍候"
+                actions={
+                  <button className="mono-btn mono-btn-primary" onClick={game.skipModal}>
+                    確認
+                  </button>
+                }
+                onClose={game.skipModal}
+              />
+            );
+          }
 
-            if (!owner) {
-              const discount = currentPlayer.statusEffects.landDiscountNext;
-              const finalPrice = Math.max(0, propertyDef.price - discount);
-              return (
-                <>
-                  <p>
-                    {tile.icon} {tile.name}
-                  </p>
-                  <p>{tile.description}</p>
-                  <p>售價：${propertyDef.price}</p>
-                  {discount > 0 ? <p>折價券生效：-{discount}，實付 ${finalPrice}</p> : null}
-                  <div className="modal-actions">
+          const locationImageSrc = getLandmarkImageSrc(tile.id);
+
+          if (!owner) {
+            const discount = currentPlayer.statusEffects.landDiscountNext;
+            const finalPrice = Math.max(0, propertyDef.price - discount);
+            return (
+              <MonopolyPopup
+                playerName={currentPlayer.name}
+                playerTokenIcon={currentPlayer.tokenIcon}
+                locationName={tile.name}
+                locationImageSrc={locationImageSrc}
+                fallbackIcon={tile.icon}
+                theme="buy"
+                effectIcon="🏠"
+                effectTitle="這塊土地尚未被購買"
+                effectAmount={`$${finalPrice}`}
+                effectExtra={discount > 0 ? <p className="mono-effect-sub">折價券生效：-{discount}</p> : null}
+                actions={
+                  <>
                     <button
-                      className="primary-btn"
+                      className="mono-btn mono-btn-soft"
                       disabled={currentPlayer.money < finalPrice}
                       onClick={game.buyCurrentTileProperty}
                     >
-                      購買景點
+                      購買土地
                     </button>
-                    <button onClick={game.skipModal}>略過</button>
-                  </div>
-                </>
-              );
-            }
-
-            if (owner.id === currentPlayer.id) {
-              const level = propertyState.level;
-              const canUpgrade = level < 3;
-              const upgradeCost = propertyDef.upgradeCosts[level] ?? 0;
-              const useFreeUpgrade = currentPlayer.statusEffects.freeUpgrade > 0;
-              return (
-                <>
-                  <p>
-                    你已持有 {tile.name}（Lv.{level}）。
-                  </p>
-                  <p>當前租金：${propertyDef.rent[level]}</p>
-                  {canUpgrade ? (
-                    <>
-                      <p>
-                        下次升級成本：{useFreeUpgrade ? "可用免費升級" : `$${upgradeCost}`}
-                      </p>
-                      <div className="modal-actions">
-                        <button
-                          className="primary-btn"
-                          disabled={!useFreeUpgrade && currentPlayer.money < upgradeCost}
-                          onClick={game.upgradeCurrentTileProperty}
-                        >
-                          升級景點
-                        </button>
-                        <button onClick={game.skipModal}>暫不升級</button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <p>已達最高等級。</p>
-                      <button onClick={game.skipModal}>知道了</button>
-                    </>
-                  )}
-                </>
-              );
-            }
-
-            return (
-              <>
-                <p>
-                  {tile.name} 已由 {owner.name} 持有。
-                </p>
-                <button onClick={game.skipModal}>關閉</button>
-              </>
+                    <button className="mono-btn mono-btn-primary" onClick={game.skipModal}>
+                      確認
+                    </button>
+                  </>
+                }
+                onClose={game.skipModal}
+              />
             );
-          })()}
-        </ModalShell>
+          }
+
+          if (owner.id === currentPlayer.id) {
+            const level = propertyState.level;
+            const canUpgrade = level < 3;
+            const upgradeCost = propertyDef.upgradeCosts[level] ?? 0;
+            const useFreeUpgrade = currentPlayer.statusEffects.freeUpgrade > 0;
+            return (
+              <MonopolyPopup
+                playerName={currentPlayer.name}
+                playerTokenIcon={currentPlayer.tokenIcon}
+                locationName={tile.name}
+                locationImageSrc={locationImageSrc}
+                fallbackIcon={tile.icon}
+                theme="earn"
+                effectIcon="📈"
+                effectTitle={`你已持有這塊地（Lv.${level}）`}
+                effectAmount={canUpgrade ? (useFreeUpgrade ? "可用免費升級" : `升級費用 $${upgradeCost}`) : "已達最高等級"}
+                effectExtra={<p className="mono-effect-sub">當前租金：${propertyDef.rent[level]}</p>}
+                actions={
+                  <>
+                    {canUpgrade ? (
+                      <button
+                        className="mono-btn mono-btn-soft"
+                        disabled={!useFreeUpgrade && currentPlayer.money < upgradeCost}
+                        onClick={game.upgradeCurrentTileProperty}
+                      >
+                        升級景點
+                      </button>
+                    ) : null}
+                    <button className="mono-btn mono-btn-primary" onClick={game.skipModal}>
+                      確認
+                    </button>
+                  </>
+                }
+                onClose={game.skipModal}
+              />
+            );
+          }
+
+          return (
+            <MonopolyPopup
+              playerName={currentPlayer.name}
+              playerTokenIcon={currentPlayer.tokenIcon}
+              locationName={tile.name}
+              locationImageSrc={locationImageSrc}
+              fallbackIcon={tile.icon}
+              theme="pay"
+              effectIcon="💸"
+              effectTitle={`${tile.name} 已由 ${owner.name} 持有`}
+              effectAmount="請查看付款通知"
+              actions={
+                <button className="mono-btn mono-btn-primary" onClick={game.skipModal}>
+                  確認
+                </button>
+              }
+              onClose={game.skipModal}
+            />
+          );
+        })()
       ) : null}
 
       {game.gameState.modal.type === "shop" && currentPlayer ? (
-        <ModalShell title="港都雜貨舖" onClose={game.skipModal} variant="retro">
-          <p>目前金額：${currentPlayer.money}</p>
-          <div className="shop-grid">
+        <MonopolyPopup
+          playerName={currentPlayer.name}
+          playerTokenIcon={currentPlayer.tokenIcon}
+          locationName={currentTile?.name ?? "港都雜貨舖"}
+          fallbackIcon={currentTile?.icon ?? "🛍️"}
+          theme="shop"
+          effectIcon="🧰"
+          effectTitle="歡迎來到港都雜貨舖"
+          effectAmount={`目前金額：$${currentPlayer.money}`}
+          actions={
+            <button className="mono-btn mono-btn-primary" onClick={game.skipModal}>
+              離開商店
+            </button>
+          }
+          onClose={game.skipModal}
+        >
+          <div className="mono-shop-grid">
             {game.dataBundle.shopItems.map((item: ShopItemDef) => {
               const carry = currentPlayer.inventory[item.id] ?? 0;
               const canBuy = currentPlayer.money >= item.price && carry < item.maxCarry;
               return (
-                <article key={item.id} className="shop-item-card">
+                <article key={item.id} className="mono-shop-item">
                   <h4>
                     {item.icon} {item.name}
                   </h4>
@@ -416,47 +490,57 @@ export function GamePage() {
                   <p>
                     持有：{carry}/{item.maxCarry}
                   </p>
-                  <button disabled={!canBuy} onClick={() => game.buyShopItem(item)}>
+                  <button className="mono-btn mono-btn-soft" disabled={!canBuy} onClick={() => game.buyShopItem(item)}>
                     購買
                   </button>
                 </article>
               );
             })}
           </div>
-          <div className="modal-actions">
-            <button className="primary-btn" onClick={game.skipModal}>
-              離開商店
-            </button>
-          </div>
-        </ModalShell>
+        </MonopolyPopup>
       ) : null}
 
-      {game.gameState.modal.type === "card" ? (
-        <ModalShell title="抽卡事件" onClose={game.skipModal} variant="retro">
-          <p className="hint-text">
-            抵達地點：{currentTile?.icon} {currentTile?.name}
-          </p>
-          <p>
-            {cardModalPayload?.card.icon} {cardModalPayload?.card.title}
-          </p>
-          <p>{cardModalPayload?.card.description}</p>
-          <div className="modal-actions">
-            <button className="primary-btn" onClick={game.applyCard}>
+      {game.gameState.modal.type === "card" && currentPlayer ? (
+        <MonopolyPopup
+          playerName={currentPlayer.name}
+          playerTokenIcon={currentPlayer.tokenIcon}
+          locationName={currentTile?.name ?? "事件格"}
+          locationImageSrc={currentTile?.type === "property" ? getLandmarkImageSrc(currentTile.id) : undefined}
+          fallbackIcon={currentTile?.icon ?? "🎴"}
+          theme="card"
+          effectIcon={cardModalPayload?.card.icon ?? "🎴"}
+          effectTitle={cardModalPayload?.card.title ?? "抽卡事件"}
+          effectExtra={<p className="mono-effect-sub">{cardModalPayload?.card.description}</p>}
+          actions={
+            <button className="mono-btn mono-btn-primary" onClick={game.applyCard}>
               套用效果
             </button>
-          </div>
-        </ModalShell>
+          }
+          onClose={game.skipModal}
+        />
       ) : null}
 
-      {game.gameState.modal.type === "quiz" ? (
-        <ModalShell
-          title={quizModalPayload?.source === "turn_gate" ? "回合開始答題（必答）" : "港都知識王"}
+      {game.gameState.modal.type === "quiz" && currentPlayer ? (
+        <MonopolyPopup
+          playerName={currentPlayer.name}
+          playerTokenIcon={currentPlayer.tokenIcon}
+          locationName={quizModalPayload?.source === "turn_gate" ? "回合開始答題（必答）" : currentTile?.name ?? "港都知識王"}
+          locationImageSrc={currentTile?.type === "property" ? getLandmarkImageSrc(currentTile.id) : undefined}
+          fallbackIcon={currentTile?.icon ?? "🧠"}
+          theme="quiz"
+          effectIcon="❓"
+          effectTitle={quizModalPayload?.question.question ?? "題目讀取中"}
+          effectExtra={
+            <p className="mono-effect-sub">
+              {quizModalPayload?.source === "turn_gate"
+                ? "本題答對才可開始本回合行動。"
+                : "答對可獲獎勵，答錯可能扣款或停留。"}
+            </p>
+          }
           onClose={quizModalPayload?.source === "turn_gate" ? undefined : handleCloseQuizModal}
-          variant="retro"
         >
-          <p>{quizModalPayload?.question.question}</p>
-          <section className="quiz-tts-panel">
-            <div className="quiz-tts-row">
+          <section className="mono-quiz-tts">
+            <div className="mono-quiz-tts-row">
               <label className="checkbox-label">
                 <input
                   type="checkbox"
@@ -465,7 +549,7 @@ export function GamePage() {
                 />
                 自動朗讀題目
               </label>
-              <label className="quiz-tts-speed">
+              <label className="mono-tts-speed">
                 語速：{ttsRate.toFixed(1)}x
                 <input
                   type="range"
@@ -478,10 +562,10 @@ export function GamePage() {
                 />
               </label>
             </div>
-            <div className="modal-actions">
+            <div className="mono-actions">
               <button
                 type="button"
-                className="secondary-btn"
+                className="mono-btn mono-btn-soft"
                 disabled={!ttsSupported || !quizModalPayload?.question}
                 onClick={() => {
                   if (!quizModalPayload?.question) return;
@@ -490,102 +574,115 @@ export function GamePage() {
               >
                 朗讀題目
               </button>
-              <button type="button" disabled={!ttsSupported || !ttsSpeaking} onClick={stopQuizTts}>
+              <button type="button" className="mono-btn mono-btn-soft" disabled={!ttsSupported || !ttsSpeaking} onClick={stopQuizTts}>
                 停止朗讀
               </button>
             </div>
-            <p className="hint-text">
-              {ttsSupported
-                ? ttsSpeaking
-                  ? "正在語音朗讀中，可按「停止朗讀」。"
-                  : "可手動朗讀題目，或開啟自動朗讀。"
-                : "此裝置/瀏覽器不支援 TTS 語音報讀。"}
-            </p>
           </section>
-          <div className="quiz-options">
+          <div className="mono-quiz-options">
             {quizModalPayload?.question.options.map((option, index) => (
-              <button key={`${option}_${index}`} onClick={() => handleAnswer(index)}>
+              <button key={`${option}_${index}`} className="mono-quiz-option-btn" onClick={() => handleAnswer(index)}>
                 {String.fromCharCode(65 + index)}. {option}
               </button>
             ))}
           </div>
-          <p className="hint-text">
-            {quizModalPayload?.source === "turn_gate"
-              ? "本題答對才可開始本回合行動；答錯會直接結束回合。"
-              : "答對可獲獎勵，答錯可能扣款或停留。"}
-          </p>
-        </ModalShell>
+        </MonopolyPopup>
       ) : null}
 
       {game.gameState.modal.type === "payment_notice" ? (
-        <ModalShell title="付款通知" variant="retro">
-          <div className="payment-notice-body">
-            <p className="payment-notice-title">
-              {paymentModalPayload?.notice.isWaived ? "本次付款已抵銷" : "已發生付款"}
-            </p>
-            <p>
-              原因：{paymentModalPayload?.notice.reason}
-            </p>
-            <p>
-              金額：${paymentModalPayload?.notice.amount ?? 0}
-            </p>
-            <hr className="retro-divider" />
-            <p>
-              付款人：{paymentModalPayload?.notice.payerName}
-            </p>
-            <p>
-              金額變化：${paymentModalPayload?.notice.payerBefore ?? 0} → ${paymentModalPayload?.notice.payerAfter ?? 0}
-            </p>
-            <p>
-              收款方：
-              {paymentModalPayload?.notice.isSystemReceiver
-                ? "系統/銀行"
-                : paymentModalPayload?.notice.receiverName}
-            </p>
-            {paymentModalPayload?.notice.isSystemReceiver ? (
-              <p>系統收款不追蹤帳戶餘額。</p>
-            ) : (
-              <p>
-                收款方金額：${paymentModalPayload?.notice.receiverBefore ?? 0} → ${paymentModalPayload?.notice.receiverAfter ?? 0}
-              </p>
-            )}
-            {paymentModalPayload?.notice.isWaived ? (
-              <p className="payment-waived-text">已使用保護效果，未實際扣款或轉帳。</p>
-            ) : null}
-          </div>
-          <div className="modal-actions">
-            <button className="primary-btn" onClick={game.acknowledgePaymentNotice}>
-              知道了
-            </button>
-          </div>
-        </ModalShell>
+        (() => {
+          const notice = paymentModalPayload?.notice;
+          const paymentTile = resolvePaymentTile(notice);
+          const receiverText = notice?.isSystemReceiver ? "系統/銀行" : notice?.receiverName;
+          return (
+            <MonopolyPopup
+              playerName={notice?.payerName ?? currentPlayerName}
+              playerTokenIcon={currentPlayerToken}
+              locationName={paymentTile?.name ?? "付款事件"}
+              locationImageSrc={paymentTile ? getLandmarkImageSrc(paymentTile.id) : undefined}
+              fallbackIcon={paymentTile?.icon ?? "💰"}
+              playerHint={notice?.isWaived ? `${notice?.payerName ?? "玩家"} 觸發付款抵銷！` : `${notice?.payerName ?? "玩家"} 觸發付款事件！`}
+              theme="pay"
+              effectIcon={notice?.isWaived ? "🛡️" : "💵"}
+              effectTitle={notice?.reason ?? "付款通知"}
+              effectAmount={notice?.isWaived ? "已抵銷，未實際扣款" : `-$${notice?.amount ?? 0}`}
+              effectExtra={
+                <div className="mono-effect-sub mono-payment-list">
+                  <p>付款人：{notice?.payerName}</p>
+                  <p>
+                    付款人金額：${notice?.payerBefore ?? 0} → ${notice?.payerAfter ?? 0}
+                  </p>
+                  <p>收款方：{receiverText}</p>
+                  {notice?.isSystemReceiver ? (
+                    <p>系統收款不追蹤帳戶餘額。</p>
+                  ) : (
+                    <p>
+                      收款方金額：${notice?.receiverBefore ?? 0} → ${notice?.receiverAfter ?? 0}
+                    </p>
+                  )}
+                </div>
+              }
+              actions={
+                <button className="mono-btn mono-btn-primary" onClick={game.acknowledgePaymentNotice}>
+                  確認
+                </button>
+              }
+            />
+          );
+        })()
       ) : null}
 
       {game.gameState.modal.type === "message" ? (
-        <ModalShell title={messageModalPayload?.title ?? "地點提示"} onClose={game.skipModal} variant="retro">
-          <p>{messageModalPayload?.message}</p>
-          <div className="modal-actions">
-            <button className="primary-btn" onClick={game.skipModal}>
-              知道了
-            </button>
-          </div>
-        </ModalShell>
+        (() => {
+          const tile = resolveMessageTile(messageModalPayload?.title);
+          return (
+            <MonopolyPopup
+              playerName={currentPlayerName}
+              playerTokenIcon={currentPlayerToken}
+              locationName={tile?.name ?? messageModalPayload?.title ?? "地點提示"}
+              locationImageSrc={tile && tile.type === "property" ? getLandmarkImageSrc(tile.id) : undefined}
+              fallbackIcon={tile?.icon ?? "📍"}
+              theme="message"
+              effectIcon="📢"
+              effectTitle={messageModalPayload?.message ?? "已抵達新地點。"}
+              actions={
+                <button className="mono-btn mono-btn-primary" onClick={game.skipModal}>
+                  確認
+                </button>
+              }
+              onClose={game.skipModal}
+            />
+          );
+        })()
       ) : null}
 
       {showEndGameConfirm ? (
-        <ModalShell title="確認結束遊戲" onClose={() => setShowEndGameConfirm(false)} variant="retro">
-          <p>確定要結束本局並前往結算頁嗎？</p>
-          <p className="hint-text">結束後會依照現金 + 房產價值進行排名。</p>
-          <div className="modal-actions">
-            <button className="primary-btn" onClick={handleConfirmFinishGame}>
-              確定結束並結算
-            </button>
-            <button onClick={() => setShowEndGameConfirm(false)}>取消</button>
-          </div>
-        </ModalShell>
+        <MonopolyPopup
+          playerName={currentPlayerName}
+          playerTokenIcon={currentPlayerToken}
+          locationName="確認結束遊戲"
+          fallbackIcon="🏁"
+          theme="confirm"
+          effectIcon="📊"
+          effectTitle="確定要結束本局並前往結算頁嗎？"
+          effectExtra={<p className="mono-effect-sub">結束後會依照現金 + 房產價值進行排名。</p>}
+          actions={
+            <>
+              <button className="mono-btn mono-btn-soft" onClick={() => setShowEndGameConfirm(false)}>
+                取消
+              </button>
+              <button className="mono-btn mono-btn-primary" onClick={handleConfirmFinishGame}>
+                確定結束並結算
+              </button>
+            </>
+          }
+          onClose={() => setShowEndGameConfirm(false)}
+        />
       ) : null}
     </main>
   );
 }
+
+
 
 

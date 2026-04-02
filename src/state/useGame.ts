@@ -185,6 +185,10 @@ export function useGame(initialData: SeedDataBundle) {
     setGameState((prev) => ({ ...prev, soundQueue: [...prev.soundQueue, createSoundEvent(type)] }));
   };
 
+  const openLocationModal = (title: string, message: string) => {
+    setModal("message", { title, message });
+  };
+
   const canPayWithOptionalImmunity = (player: PlayerState, amount: number, allowImmunity = true): boolean => {
     if (amount <= 0) return true;
     return canAfford(player, amount) || (allowImmunity && player.statusEffects.moneyImmunity > 0);
@@ -254,7 +258,7 @@ export function useGame(initialData: SeedDataBundle) {
       const payer = players[payerIndex];
       const receiver = players[receiverIndex];
 
-      if (reason === "租金" && payer.statusEffects.rentImmunity > 0) {
+      if (reason.startsWith("租金") && payer.statusEffects.rentImmunity > 0) {
         players[payerIndex] = {
           ...payer,
           statusEffects: { ...payer.statusEffects, rentImmunity: payer.statusEffects.rentImmunity - 1 }
@@ -465,7 +469,7 @@ export function useGame(initialData: SeedDataBundle) {
         config: dataBundle.gameConfig
       });
 
-      transferMoney(player.id, owner.id, rent, "租金");
+      transferMoney(player.id, owner.id, rent, `租金：${tile.name}`);
       setPhase("await_end");
       return;
     }
@@ -499,11 +503,13 @@ export function useGame(initialData: SeedDataBundle) {
     if (tile.type === "traffic_jam") {
       applySkipTurns(player.id, 1, "因交通壅塞");
       setPhase("await_end");
+      openLocationModal("抵達：過港隧道", `${player.name} 遇到交通壅塞，將停留 1 回合。`);
       return;
     }
     if (tile.type === "rest") {
       applySkipTurns(player.id, 1, "在壽山看夜景休息");
       setPhase("await_end");
+      openLocationModal("抵達：壽山看夜景", `${player.name} 在壽山休息，下一回合將停留。`);
       return;
     }
     if (tile.type === "go_to_jam") {
@@ -521,10 +527,25 @@ export function useGame(initialData: SeedDataBundle) {
         return { ...prev, players };
       });
       setPhase("await_end");
+      openLocationModal("抵達：趕不上輕軌", `${player.name} 被強制移動到過港隧道，並停留 1 回合。`);
       return;
     }
 
-    writeLog(tile.type === "start" ? `${player.name} 抵達起點，整裝再出發。` : `${player.name} 抵達 ${tile.name}。`);
+    if (tile.type === "start") {
+      writeLog(`${player.name} 抵達起點，整裝再出發。`);
+      setPhase("await_end");
+      openLocationModal("抵達：高雄車站（起點）", `${player.name} 抵達起點。經過起點時可領取 ${dataBundle.gameConfig.startBonus} 元旅遊津貼。`);
+      return;
+    }
+
+    if (tile.type === "transport" || tile.type === "public") {
+      writeLog(`${player.name} 抵達 ${tile.name}。`);
+      setPhase("await_end");
+      openLocationModal(`抵達：${tile.name}`, `${player.name} 到達 ${tile.name}。${tile.description}`);
+      return;
+    }
+
+    writeLog(`${player.name} 抵達 ${tile.name}。`);
     setPhase("await_end");
   };
 

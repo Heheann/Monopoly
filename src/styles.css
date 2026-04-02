@@ -245,6 +245,48 @@ button:disabled {
   gap: 3px;
 }
 
+.go-tile {
+  background:
+    linear-gradient(135deg, #f6fff9 0%, #ebfff2 45%, #fef9ea 100%);
+  border-top-width: 10px;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.go-salary-text {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #214c63;
+  line-height: 1.15;
+}
+
+.go-word {
+  margin-top: 1px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: #13151a;
+}
+
+.go-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #263342;
+}
+
+.go-arrow {
+  width: 100%;
+  padding: 2px 6px;
+  border: 2px solid #231d1d;
+  background: #f04545;
+  color: #ffffff;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .token-chip {
   min-width: 20px;
   height: 20px;
@@ -890,6 +932,15 @@ button:disabled {
 
   .tile-meta,
   .tile-property-info {
+    font-size: 0.52rem;
+  }
+
+  .go-word {
+    font-size: 1.15rem;
+  }
+
+  .go-salary-text,
+  .go-label {
     font-size: 0.52rem;
   }
 

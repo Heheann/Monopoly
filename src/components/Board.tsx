@@ -6,6 +6,7 @@ interface BoardProps {
   properties: Record<string, PropertyState>;
   propertyDefs: PropertyDef[];
   currentPlayerId?: string;
+  startBonus: number;
 }
 
 const positionGrid = [
@@ -18,7 +19,7 @@ const positionGrid = [
   [6, 5, 4, 3, 2, 1, 0]
 ];
 
-export function Board({ board, players, properties, propertyDefs, currentPlayerId }: BoardProps) {
+export function Board({ board, players, properties, propertyDefs, currentPlayerId, startBonus }: BoardProps) {
   const byPosition = new Map<number, BoardTile>(board.map((tile) => [tile.position, tile]));
   const centerLogoSrc = `${import.meta.env.BASE_URL}logo-center.png`;
 
@@ -34,6 +35,30 @@ export function Board({ board, players, properties, propertyDefs, currentPlayerI
     const propertyDef = propertyDefs.find((item) => item.boardTileId === tile.id);
     const propertyState = properties[tile.id];
     const owner = propertyState?.ownerId ? players.find((player) => player.id === propertyState.ownerId) : null;
+
+    if (tile.type === "start") {
+      return (
+        <div className={`board-tile tile-${tile.type} go-tile`} style={{ borderTopColor: tile.color }}>
+          <p className="go-salary-text">經過可領旅遊津貼 ${startBonus}</p>
+          <p className="go-word">GO</p>
+          <p className="go-label">起點 START</p>
+          <div className="go-arrow" aria-hidden>
+            <span>⟵</span>
+          </div>
+          <div className="tile-players">
+            {tilePlayers.map((player) => (
+              <span
+                key={player.id}
+                className={`token-chip ${player.id === currentPlayerId ? "active" : ""}`}
+                title={player.name}
+              >
+                {player.tokenIcon}
+              </span>
+            ))}
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className={`board-tile tile-${tile.type}`} style={{ borderTopColor: tile.color }}>

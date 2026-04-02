@@ -58,6 +58,7 @@ export function GamePage() {
     | { question: QuestionDef; source: "turn_gate" | "tile_quiz" }
     | undefined;
   const paymentModalPayload = game.gameState.modal.payload as { notice: PaymentNotice } | undefined;
+  const messageModalPayload = game.gameState.modal.payload as { title: string; message: string } | undefined;
 
   const stopQuizTts = useCallback(() => {
     if (!ttsSupported) return;
@@ -287,6 +288,7 @@ export function GamePage() {
                 properties={game.gameState.properties}
                 propertyDefs={game.dataBundle.properties}
                 currentPlayerId={currentPlayer?.id}
+                startBonus={game.dataBundle.gameConfig.startBonus}
               />
             </div>
             <div className="right-column">
@@ -431,6 +433,9 @@ export function GamePage() {
 
       {game.gameState.modal.type === "card" ? (
         <ModalShell title="抽卡事件" onClose={game.skipModal} variant="retro">
+          <p className="hint-text">
+            抵達地點：{currentTile?.icon} {currentTile?.name}
+          </p>
           <p>
             {cardModalPayload?.card.icon} {cardModalPayload?.card.title}
           </p>
@@ -550,6 +555,17 @@ export function GamePage() {
           </div>
           <div className="modal-actions">
             <button className="primary-btn" onClick={game.acknowledgePaymentNotice}>
+              知道了
+            </button>
+          </div>
+        </ModalShell>
+      ) : null}
+
+      {game.gameState.modal.type === "message" ? (
+        <ModalShell title={messageModalPayload?.title ?? "地點提示"} onClose={game.skipModal} variant="retro">
+          <p>{messageModalPayload?.message}</p>
+          <div className="modal-actions">
+            <button className="primary-btn" onClick={game.skipModal}>
               知道了
             </button>
           </div>

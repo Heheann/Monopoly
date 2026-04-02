@@ -349,7 +349,6 @@ export function GamePage() {
                 playerName={currentPlayerName}
                 playerTokenIcon={currentPlayerToken}
                 locationName="景點資料讀取中"
-                fallbackIcon="🏞️"
                 theme="message"
                 effectIcon="⏳"
                 effectTitle="資料載入中，請稍候"
@@ -374,7 +373,6 @@ export function GamePage() {
                 playerTokenIcon={currentPlayer.tokenIcon}
                 locationName={tile.name}
                 locationImageSrc={locationImageSrc}
-                fallbackIcon={tile.icon}
                 theme="buy"
                 effectIcon="🏠"
                 effectTitle="這塊土地尚未被購買"
@@ -410,7 +408,6 @@ export function GamePage() {
                 playerTokenIcon={currentPlayer.tokenIcon}
                 locationName={tile.name}
                 locationImageSrc={locationImageSrc}
-                fallbackIcon={tile.icon}
                 theme="earn"
                 effectIcon="📈"
                 effectTitle={`你已持有這塊地（Lv.${level}）`}
@@ -443,7 +440,6 @@ export function GamePage() {
               playerTokenIcon={currentPlayer.tokenIcon}
               locationName={tile.name}
               locationImageSrc={locationImageSrc}
-              fallbackIcon={tile.icon}
               theme="pay"
               effectIcon="💸"
               effectTitle={`${tile.name} 已由 ${owner.name} 持有`}
@@ -464,7 +460,7 @@ export function GamePage() {
           playerName={currentPlayer.name}
           playerTokenIcon={currentPlayer.tokenIcon}
           locationName={currentTile?.name ?? "港都雜貨舖"}
-          fallbackIcon={currentTile?.icon ?? "🛍️"}
+          locationImageSrc={currentTile ? getLandmarkImageSrc(currentTile.id) : undefined}
           theme="shop"
           effectIcon="🧰"
           effectTitle="歡迎來到港都雜貨舖"
@@ -505,8 +501,7 @@ export function GamePage() {
           playerName={currentPlayer.name}
           playerTokenIcon={currentPlayer.tokenIcon}
           locationName={currentTile?.name ?? "事件格"}
-          locationImageSrc={currentTile?.type === "property" ? getLandmarkImageSrc(currentTile.id) : undefined}
-          fallbackIcon={currentTile?.icon ?? "🎴"}
+          locationImageSrc={currentTile ? getLandmarkImageSrc(currentTile.id) : undefined}
           theme="card"
           effectIcon={cardModalPayload?.card.icon ?? "🎴"}
           effectTitle={cardModalPayload?.card.title ?? "抽卡事件"}
@@ -525,8 +520,7 @@ export function GamePage() {
           playerName={currentPlayer.name}
           playerTokenIcon={currentPlayer.tokenIcon}
           locationName={quizModalPayload?.source === "turn_gate" ? "回合開始答題（必答）" : currentTile?.name ?? "港都知識王"}
-          locationImageSrc={currentTile?.type === "property" ? getLandmarkImageSrc(currentTile.id) : undefined}
-          fallbackIcon={currentTile?.icon ?? "🧠"}
+          locationImageSrc={currentTile ? getLandmarkImageSrc(currentTile.id) : undefined}
           theme="quiz"
           effectIcon="❓"
           effectTitle={quizModalPayload?.question.question ?? "題目讀取中"}
@@ -600,7 +594,6 @@ export function GamePage() {
               playerTokenIcon={currentPlayerToken}
               locationName={paymentTile?.name ?? "付款事件"}
               locationImageSrc={paymentTile ? getLandmarkImageSrc(paymentTile.id) : undefined}
-              fallbackIcon={paymentTile?.icon ?? "💰"}
               playerHint={notice?.isWaived ? `${notice?.payerName ?? "玩家"} 觸發付款抵銷！` : `${notice?.payerName ?? "玩家"} 觸發付款事件！`}
               theme="pay"
               effectIcon={notice?.isWaived ? "🛡️" : "💵"}
@@ -640,8 +633,7 @@ export function GamePage() {
               playerName={currentPlayerName}
               playerTokenIcon={currentPlayerToken}
               locationName={tile?.name ?? messageModalPayload?.title ?? "地點提示"}
-              locationImageSrc={tile && tile.type === "property" ? getLandmarkImageSrc(tile.id) : undefined}
-              fallbackIcon={tile?.icon ?? "📍"}
+              locationImageSrc={tile ? getLandmarkImageSrc(tile.id) : undefined}
               theme="message"
               effectIcon="📢"
               effectTitle={messageModalPayload?.message ?? "已抵達新地點。"}
@@ -661,7 +653,6 @@ export function GamePage() {
           playerName={currentPlayerName}
           playerTokenIcon={currentPlayerToken}
           locationName="確認結束遊戲"
-          fallbackIcon="🏁"
           theme="confirm"
           effectIcon="📊"
           effectTitle="確定要結束本局並前往結算頁嗎？"

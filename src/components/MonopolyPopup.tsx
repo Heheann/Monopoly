@@ -7,7 +7,6 @@ interface MonopolyPopupProps {
   locationName: string;
   locationImageSrc?: string;
   locationImageAlt?: string;
-  fallbackIcon?: string;
   playerHint?: string;
   theme?: PopupTheme;
   effectIcon?: ReactNode;
@@ -25,7 +24,6 @@ export function MonopolyPopup({
   locationName,
   locationImageSrc,
   locationImageAlt,
-  fallbackIcon = "📍",
   playerHint,
   theme = "message",
   effectIcon,
@@ -41,6 +39,8 @@ export function MonopolyPopup({
   useEffect(() => {
     setImageBroken(false);
   }, [locationImageSrc]);
+
+  const shouldShowImage = Boolean(locationImageSrc) && !imageBroken;
 
   return (
     <div className="mono-popup-overlay">
@@ -65,21 +65,16 @@ export function MonopolyPopup({
 
           <h3 className="mono-location-title">{locationName}</h3>
 
-          <div className="mono-location-image-wrap">
-            {locationImageSrc && !imageBroken ? (
+          {shouldShowImage ? (
+            <div className="mono-location-image-wrap">
               <img
                 src={locationImageSrc}
                 alt={locationImageAlt ?? locationName}
                 className="mono-location-image"
                 onError={() => setImageBroken(true)}
               />
-            ) : (
-              <div className="mono-location-fallback">
-                <span>{fallbackIcon}</span>
-                <p>尚未提供景點圖片</p>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : null}
 
           {effectTitle || effectAmount || effectExtra ? (
             <section className="mono-effect-card">

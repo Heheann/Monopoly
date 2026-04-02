@@ -162,6 +162,108 @@ button:disabled {
   color: #0f4f76;
 }
 
+.dice-roller {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-width: 180px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 2px solid #d6e9fb;
+  background: linear-gradient(135deg, #fef4ff 0%, #eef8ff 52%, #fdf8e9 100%);
+  box-shadow: 0 8px 16px rgba(43, 84, 126, 0.12);
+}
+
+.dice-display {
+  width: 84px;
+  height: 84px;
+  border-radius: 22px;
+  border: 2px solid #dceaf8;
+  background: #ffffff;
+  box-shadow: 0 6px 12px rgba(57, 89, 125, 0.16);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.dice-display.is-rolling {
+  animation: diceRollSpin 340ms ease-in-out infinite;
+  box-shadow: 0 0 18px rgba(117, 184, 255, 0.58);
+}
+
+.dice-display.is-bouncing {
+  animation: diceSettleBounce 260ms ease-out;
+}
+
+.dice-number {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #19374f;
+  line-height: 1;
+}
+
+.dice-face {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-size: 1rem;
+  opacity: 0.48;
+}
+
+.dice-roll-btn {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #69c3ff 0%, #4da9f2 100%);
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.dice-roll-btn:hover:enabled {
+  filter: brightness(1.04);
+}
+
+.dice-roll-btn:active:enabled {
+  transform: translateY(1px);
+}
+
+.dice-result-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #17517a;
+}
+
+@keyframes diceRollSpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  35% {
+    transform: rotate(10deg) scale(1.06);
+  }
+  70% {
+    transform: rotate(-10deg) scale(0.96);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes diceSettleBounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-7px) scale(1.04);
+  }
+  70% {
+    transform: translateY(3px) scale(0.98);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
 .game-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
@@ -1271,6 +1373,14 @@ button:disabled {
 
   .game-layout {
     padding: 0 12px;
+  }
+
+  .dice-roller {
+    width: 100%;
+  }
+
+  .turn-actions {
+    width: 100%;
   }
 
   .mono-popup-card {

@@ -1,6 +1,7 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Board } from "../components/Board";
+import { DiceRoller } from "../components/DiceRoller";
 import { EventLog } from "../components/EventLog";
 import { InventoryPanel } from "../components/InventoryPanel";
 import { MonopolyPopup } from "../components/MonopolyPopup";
@@ -288,13 +289,12 @@ export function GamePage() {
               </p>
             </div>
             <div className="turn-actions">
-              <button
-                className="primary-btn"
-                disabled={game.gameState.phase !== "await_roll"}
-                onClick={() => game.rollDice()}
-              >
-                擲骰
-              </button>
+              <DiceRoller
+                disabled={game.gameState.phase !== "await_roll" || game.gameState.modal.type !== null}
+                forcedResult={currentPlayer?.statusEffects.fixedDice ?? undefined}
+                lastValue={game.gameState.lastDice}
+                onRollComplete={(value) => game.rollDice(value)}
+              />
               <button
                 className="secondary-btn"
                 disabled={game.gameState.phase !== "await_end"}
@@ -302,7 +302,6 @@ export function GamePage() {
               >
                 結束回合
               </button>
-              <p className="dice-value">骰子：{game.gameState.lastDice ?? "-"}</p>
             </div>
           </section>
 

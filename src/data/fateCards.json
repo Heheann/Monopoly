@@ -12,13 +12,13 @@
   },
   {
     "id": "fate_002",
-    "title": "共享機車違停",
-    "description": "違規停放共享機車，罰款 200 元。",
+    "title": "YouBike沒有歸還",
+    "description": "YouBike 沒有歸還，需支付調度費 200 元。",
     "type": "fate",
     "effectType": "MONEY",
     "effectValue": -200,
     "target": "self",
-    "icon": "🛵",
+    "icon": "🚲",
     "rarity": "common"
   },
   {
@@ -89,8 +89,8 @@
   },
   {
     "id": "fate_009",
-    "title": "捷運公益票",
-    "description": "直接移動到高雄輕軌（龍貓隧道段）。",
+    "title": "高雄捷運與輕軌一日票",
+    "description": "使用高雄捷運與輕軌一日票，直接移動到高雄輕軌（龍貓隧道段）。",
     "type": "fate",
     "effectType": "MOVE_TO_TILE",
     "effectValue": 16,

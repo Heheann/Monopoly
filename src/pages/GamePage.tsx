@@ -519,7 +519,8 @@ export function GamePage() {
         <MonopolyPopup
           playerName={currentPlayer.name}
           playerTokenIcon={currentPlayer.tokenIcon}
-          locationName={quizModalPayload?.source === "turn_gate" ? "回合開始答題（必答）" : currentTile?.name ?? "港都知識王"}
+          playerHint={`${currentPlayer.name} 在 ${currentTile?.name ?? "目前位置"}`}
+          locationName={currentTile?.name ?? "港都知識王"}
           locationImageSrc={currentTile ? getLandmarkImageSrc(currentTile.id) : undefined}
           theme="quiz"
           effectIcon="❓"
